@@ -1,4 +1,4 @@
-#rLog
+# rLog
 
 A universal approach to displaying debug messages on various platforms and frameworks. 
 With the ability to completely exclude debug messages from the code. 
