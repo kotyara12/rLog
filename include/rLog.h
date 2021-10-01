@@ -99,7 +99,7 @@ int _rlog_printf(const char *format, ...);
 const char * _rlog_system_timestamp(void);
 const char * _rlog_filename(const char * path);
 
-#define RLOG_DEFAULT_APP_TAG "APP"
+#define RLOG_DEFAULT_APP_TAG "RTOS"
 
 /* Log formats */
 #if CONFIG_RLOG_SHOW_TIMESTAMP
