@@ -106,6 +106,7 @@ const char * _rlog_system_timestamp(void)
   localtime_r(&now, &timeinfo);
 
   #if __RLOG_LOCKS_ENABLED__
+  if (bufferLock == 0) __lock_init(bufferLock);
   __lock_acquire(bufferLock);
   #endif
   snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
