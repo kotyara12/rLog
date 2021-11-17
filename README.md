@@ -1,55 +1,79 @@
-# rLog
+# rLog: библиотека для вывода отладочных сообщений с возможностью отключения
 
-A universal approach to displaying debug messages on various platforms and frameworks. 
-With the ability to completely exclude debug messages from the code. 
-Analogue of <esp32-hal-log.h> for ESP32, but with the ability to work on AVR or ESP8266. 
-Tested on AVR, ESP32, ESP8266 for PlatformIO and Arduino IDE.
+Данная библиотека представляет собой _набор макросов_ для вывода _форматированных_ отладочных сообщений в COM-порт (с использованием стандартной функции printf), _с возможностью частичного или полного их исключения из кода программы при необходимости_. Создана на основе библиотеки [<esp32-hal-log.h> для Framework Arduino ESP32](https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp32-hal-log.h), с целью обеспечения работоспособности на различных микроконтроллерах и инструментах разработки. Протестировано на AVR, ESP32, ESP8266 для PlatformIO и Arduino IDE. Библиотека _не использует объекты типа String_, вся работа основана на динамическом выделении памяти под строки с помощью стандартных функций, что экономит память.
+
+## Поддерживаниваемые платформы
+Библиотека протестирована на **VSCode + PlatformIO** и **Arduino IDE** для микроконтроллеров AVR, ESP32 и ESP8266. Предполагается, что список микроконтроллеров может больше. Библиотека не зависит от используемого Framework-а: например это может быть Arduino или Espressif32 (ESP-IDF).
+
+## Возможности
+* Поддержка [форматированных сообщений](https://docs.microsoft.com/en-us/cpp/c-runtime-library/format-specification-syntax-printf-and-wprintf-functions)
+* Автоматический вывод отметки времени, типа сообщения и идентификатора задачи при выводе отладочных сообщений (см. "Формат вывода" ниже). Вам больше не нужно заботится об этом.
+* Имеется возможность вывода имени файла и номера строки, из которого была вызвана команда.
+* Возможность выбора уровня отладки при компиляции: NONE, ERROR, WARNING, INFO, DEBUG, VERBOSE. Все сообщения, которые ниже заданного уровня, будут игнорированы компилятором и не попадут в финальный код
+* Поддержка цветовых маркеров при выводе. _Примечание: но эта функция работает не во всех инструментах разработки и не на всех операционных системах (например для PlatformIO под Windows7 мне не удалось заставить это работать, а под Windows 10 работает прекрасно), это не зависит от библиотеки_
+
+## Формат вывода
+При настройках "по умолчанию" Вы увидете следующий текст:
+**23:59:59 [E] TAG: Message**
+где:
+* 23:59:59 - Отметка времени
+* [E] - Тип сообщения, в данном примере это "ошибка"
+* TAG - Ярлык (метка), с помощью которой можно определить, какой модуль вызывал данное сообщение
+* Message - Собственно текст сообщения
+
+## Зависимости
+Библиотека зависит только от "стандартных" библиотек:
+*stdint.h
+*stdio.h
+*stdarg.h
+*stdlib.h
+*time.h
 
 ----------------------
 
-Before using the library, set the debug level of the project using a macro definition
+Перед использованием библиотеки установите уровень отладочных сообщений проекта с помощью определения макроса
 
 #define CONFIG_RLOG_PROJECT_LEVEL RLOG_LEVEL_XXXX
 
-where RLOG_LEVEL_XXXX is one of the following values (see rLog.h):
+где RLOG_LEVEL_XXXX это одно из следующих значений (см. rLog.h):
 
-- RLOG_LEVEL_NONE       (0)    /* No log output */
-- RLOG_LEVEL_ERROR      (1)    /* Critical errors, software module can not recover on its own */
-- RLOG_LEVEL_WARN       (2)    /* Error conditions from which recovery measures have been taken */
-- RLOG_LEVEL_INFO       (3)    /* Information messages which describe normal flow of events */
-- RLOG_LEVEL_DEBUG      (4)    /* Extra information which is not necessary for normal use (values, pointers, sizes, etc). */
-- RLOG_LEVEL_VERBOSE    (5)    /* Bigger chunks of debugging information, or frequent messages which can potentially flood the output. */
+RLOG_LEVEL_NONE       (0)    /* Нет вывода */
+RLOG_LEVEL_ERROR      (1)    /* Критические ошибки, программный модуль не может восстановиться самостоятельно */
+RLOG_LEVEL_WARN       (2)    /* Состояния ошибки, из которых были приняты меры по устранению */
+RLOG_LEVEL_INFO       (3)    /* Информационные сообщения, описывающие нормальный ход событий */
+RLOG_LEVEL_DEBUG      (4)    /* Дополнительная информация, которая не требуется для нормального использования (значения, указатели, размеры и т.д.). */
+RLOG_LEVEL_VERBOSE    (5)    /* Большие фрагменты отладочной информации или частые сообщения, которые потенциально могут переполнить вывод. */
 
-This can be done using the platformio.ini file, sdkconfig.h or project_config.h (as in the examples).
+Сделать это можно с помощью файла platformio.ini, sdkconfig.h или project_config.h (как в примерах - см. ниже).
 
 ----------------------
 
-If you want to use the global macro definition file project_config.h (which will be available in any PlatformIO project library),
-then place it in the SRC folder of the project (in the same place as the main project file)
-and add the following definitions to the platformio.ini project config file:
+Если Вы хотите использовать файл глобальных определений макросов project_config.h (который будет доступен в любой библиотеке проекта PlatformIO),
+то поместите его в папку SRC проекта (там же, где и главный файл проекта) 
+и добавьте к конфигурационный файл проекта platformio.ini следущие определения:
 
 [env]
-build_flags = -Isrc
-
-This flag will force the compiler to look through the project directory when pre-building libraries
-
-----------------------
-
-The output of debug messages to the serial port is carried out using the functions - macros:
-
-- rlog_v(tag, format, ...)
-- rlog_d(tag, format, ...)
-- rlog_i(tag, format, ...)
-- rlog_w(tag, format, ...)
-- rlog_e(tag, format, ...)
-
-where tag is just a text label to identify the module from where the function was called.
-
-If the level of the message function (for example, rlog_v) is higher than that specified in CONFIG_RLOG_PROJECT_LEVEL, then the preprocessor will simply exclude this call during compilation, reducing memory costs.
+build_flags = -Isrc 
+	
+Этот флаг заставит компилятор при предварительной сборке библиотек просматривать каталог проекта
 
 ----------------------
 
-See examples:
+Вывод отладочных сообщений в последовательный порт осуществляется с помощью функций - макросов:
+
+rlog_v(tag, format, ...)
+rlog_d(tag, format, ...)
+rlog_i(tag, format, ...)
+rlog_w(tag, format, ...)
+rlog_e(tag, format, ...)
+
+где tag - это просто текстовая метка для обозначения модуля, откуда была вызвана функция.
+
+Если уровень функции сообщения (например rlog_v) будет выше заданного в CONFIG_RLOG_PROJECT_LEVEL, то предпроцессор просто исключит этот вызов при компиляции, сокращая затраты памяти.
+
+----------------------
+
+Примеры использования:
 - arduinoide-arduino
 - platformio-avr-arduino
 - platformio-esp32-arduino
