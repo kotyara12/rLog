@@ -37,8 +37,8 @@ rlog_e(tag, format, ...) - output a message of the ERROR level
 where
 
 * tag - this is a text label to identify the module from where the function was called
-* format - message or format string. But don't use _string variables directly_ here. For example, if you need to display the username from the user_name variable, then instead of `rlog_i (logTAG, user_name)` you need to use a construction like `rlog_i (logTAG,"%s", user_name)`
-* ... - data to be output in conversion specification, _optional_ (см. https://docs.microsoft.com/en-us/cpp/c-runtime-library/format-specification-syntax-printf-and-wprintf-functions)
+* format - message or format string. But don't use _string variables directly_ here. For example, if you need to display the username from the user_name variable, then instead of `rlog_i(logTAG, user_name)` you need to use a construction like `rlog_i(logTAG,"%s", user_name)`
+* ... - data to be output in conversion specification, _optional_ (see https://docs.microsoft.com/en-us/cpp/c-runtime-library/format-specification-syntax-printf-and-wprintf-functions)
 
 For example for the command:
 
