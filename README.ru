@@ -120,13 +120,6 @@ build_flags = -Isrc
 
 Этот флаг заставит компилятор при сборке библиотек просматривать подкаталог src из каталога проекта, куда я и поместил свой project_config.h.
 
-## Примеры использования:
-* arduinoide-arduino
-* platformio-avr-arduino
-* platformio-esp32-arduino
-* platformio-esp32-espidf
-* platformio-esp8266-arduino
-
 ## Зависимости
 Библиотека зависит только от "стандартных" библиотек:
 * stdint.h
@@ -137,6 +130,13 @@ build_flags = -Isrc
 
 ## Поддерживаниваемые платформы
 Библиотека протестирована на **VSCode + PlatformIO** и **Arduino IDE** для микроконтроллеров AVR, ESP32 и ESP8266. Предполагается, что список микроконтроллеров может больше. Библиотека не зависит от используемого Framework-а: например это может быть Arduino или Espressif32 (ESP-IDF).
+
+## Примеры использования:
+* arduinoide-arduino
+* platformio-avr-arduino
+* platformio-esp32-arduino
+* platformio-esp32-espidf
+* platformio-esp8266-arduino
 
 ## Примечание
 Данные замечания относятся к моим библиотекам, размещенным на ресурсе https://github.com/kotyara12?tab=repositories.

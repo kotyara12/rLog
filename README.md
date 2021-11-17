@@ -90,7 +90,7 @@ Set to 1 to add the filename and line number from which the command was invoked 
 
 Default **1**
 
-#### Macros must be defined in such a place that the compiler can find them when building the _library.
+#### Macros must be defined in such a place that the compiler can find them when building the _library_.
 
 This can be done in several ways:
 
@@ -120,13 +120,6 @@ build_flags = -Isrc
 
 This flag will make the compiler, when building libraries, look at the src subdirectory from the project directory, where I put my project_config.h.
 
-## Examples of using:
-* arduinoide-arduino
-* platformio-avr-arduino
-* platformio-esp32-arduino
-* platformio-esp32-espidf
-* platformio-esp8266-arduino
-
 ## Dependencies
 The library only depends on the "standard" libraries:
 * stdint.h
@@ -137,6 +130,13 @@ The library only depends on the "standard" libraries:
 
 ## Supported platforms
 Library tested on **VSCode + PlatformIO** and **Arduino IDE** for AVR, ESP32 and ESP8266 microcontrollers. It is assumed that the list of microcontrollers could be larger. The library does not depend on the Framework used: for example, it can be Arduino or Espressif32 (ESP-IDF).
+
+## Examples of using:
+* arduinoide-arduino
+* platformio-avr-arduino
+* platformio-esp32-arduino
+* platformio-esp32-espidf
+* platformio-esp8266-arduino
 
 ## Note
 These comments refer to my libraries hosted on the resource https://github.com/kotyara12?tab=repositories.
