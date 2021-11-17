@@ -1,102 +1,102 @@
-# rLog: библиотека для вывода отладочных сообщений с возможностью отключения
+# rLog: library for outputting debug messages with the ability to disable
 
-Данная библиотека представляет собой _набор макросов_ для вывода _форматированных_ отладочных сообщений в COM-порт (с использованием стандартной функции printf), _с возможностью частичного или полного их исключения из кода программы при необходимости_. Создана на основе библиотеки [<esp32-hal-log.h> для Framework Arduino ESP32](https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp32-hal-log.h), с целью обеспечения работоспособности на различных микроконтроллерах и инструментах разработки. Протестировано на AVR, ESP32, ESP8266 для PlatformIO и Arduino IDE. Библиотека _не использует объекты типа String_, вся работа основана на динамическом выделении памяти под строки с помощью стандартных функций, что экономит память.
+This library is a _set of macros_ for outputting _formatted_ debug messages to the COM port (using the standard printf function), _with the possibility of partial or complete exclusion from the program code if necessary_. Based on library [<esp32-hal-log.h> for Arduino ESP32 Framework](https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp32-hal-log.h) , in order to ensure performance on various microcontrollers and development tools. Tested on AVR, ESP32, ESP8266 for PlatformIO and Arduino IDE. The library does not use objects of type _String_, all work is based on dynamic memory allocation for strings using standard functions, which saves memory.
 
-## Возможности
-* Поддержка [форматированных сообщений](https://docs.microsoft.com/ru-ru/cpp/c-runtime-library/format-specification-syntax-printf-and-wprintf-functions?view=msvc-160)
-* Автоматический вывод отметки времени, типа сообщения и идентификатора задачи при выводе отладочных сообщений (см. "Формат вывода" ниже). Вам больше не нужно заботится об этом.
-* Имеется возможность вывода имени файла и номера строки, из которого была вызвана команда.
-* Возможность выбора уровня отладки при компиляции: NONE, ERROR, WARNING, INFO, DEBUG, VERBOSE. Все сообщения, которые выше заданного уровня, будут игнорированы компилятором и не попадут в финальный код
-* Поддержка цветовых маркеров при выводе. _Примечание: но эта функция работает не во всех инструментах разработки и не на всех операционных системах (например для PlatformIO под Windows7 мне не удалось заставить это работать, а под Windows 10 работает прекрасно), это не зависит от библиотеки_
+## Possibilities
+* Support for [formatted messages](https://docs.microsoft.com/en-us/cpp/c-runtime-library/format-specification-syntax-printf-and-wprintf-functions?view=msvc-170)
+* Automatic output of time stamp, message type and task identifier when outputting debug messages (see "Output format" below). You don't need to worry about it anymore.
+* It is possible to display the file name and line number from which the command was called.
+* Ability to select the debug level during compilation: NONE, ERROR, WARNING, INFO, DEBUG, VERBOSE. All messages that are higher than the specified level will be ignored by the compiler and will not be included in the final code.
+* Support for color markers in the output. _Note: but this function does not work in all development tools and not on all operating systems (for example, for PlatformIO under Windows7, I could not get it to work, but under Windows 10 it works fine), it does not depend on the library_
 
-## Формат вывода
-При настройках "по умолчанию" Вы увидете следующий текст:
+## Output format
+With the default settings, you will see the following text:
 
 **23:59:59 [E] TAG: Message**
 
-где:
+where:
 
-* 23:59:59 - Отметка времени
-* [E] - Тип сообщения, в данном примере это "ошибка"
-* TAG - Ярлык (метка), с помощью которой можно определить, какой модуль вызывал данное сообщение
-* Message - Собственно текст сообщения
+* 23:59:59 - Time stamp
+* [E] - Message type, in this example it is "error"
+* TAG - A label (tag) with which you can determine which module caused this message
+* Message - The actual text of the message
 
-## Использование
-Перед использованием библиотеки как минимум выберите уровень отладочных сообщений проекта с помощью определения макроса **CONFIG_RLOG_PROJECT_LEVEL** (см. раздел "Настройки" ниже).
+## Usage
+Before using the library, at least select the level of debug messages for the project by defining the **CONFIG_RLOG_PROJECT_LEVEL** macro (see the "Settings" section below).
 
-Вывод отладочных сообщений в последовательный порт осуществляется с помощью функций-макросов:
-
-```
-rlog_v(tag, format, ...) - вывод сообщения уровня VERBOSE
-rlog_d(tag, format, ...) - вывод сообщения уровня DEBUG
-rlog_i(tag, format, ...) - вывод сообщения уровня INFORMATION
-rlog_w(tag, format, ...) - вывод сообщения уровня WARNING
-rlog_e(tag, format, ...) - вывод сообщения уровня ERROR
-```
-
-где 
-
-* tag - это текстовая метка для обозначения модуля, откуда была вызвана функция
-* format - строка сообщения или формата. Но не следует использовать здесь _строковые переменные напрямую_. Например если Вам требуется вывести имя пользователя из переменной user_name, то вместо `rlog_i(logTAG, user_name)` необходимо использовать конструкцию вида `rlog_i(logTAG, "%s", user_name)`
-* ... - данные для вывода в спецификации преобразования, _не обязательно_ (см. https://docs.microsoft.com/ru-ru/cpp/c-runtime-library/format-specification-syntax-printf-and-wprintf-functions)
-
-Например для команды:
+Debugging messages are output to the serial port using macro functions:
 
 ```
-rlog_e("WiFi", "Не удалось подключиться к точке доступа %s, код ошибки %d", ap_name, err);
+rlog_v(tag, format, ...) - output a message of the VERBOSE level
+rlog_d(tag, format, ...) - output a message of the DEBUG level
+rlog_i(tag, format, ...) - output a message of the INFORMATION level
+rlog_w(tag, format, ...) - output a message of the WARNING level
+rlog_e(tag, format, ...) - output a message of the ERROR level
 ```
 
-будет выведен следующий текст:
+where
+
+* tag - this is a text label to identify the module from where the function was called
+* format - message or format string. But don't use _string variables directly_ here. For example, if you need to display the username from the user_name variable, then instead of `rlog_i (logTAG, user_name)` you need to use a construction like `rlog_i (logTAG,"% s ", user_name)`
+* ... - data to be output in conversion specification, _optional_ (см. https://docs.microsoft.com/en-us/cpp/c-runtime-library/format-specification-syntax-printf-and-wprintf-functions)
+
+For example for the command:
 
 ```
-12:34:10 [E] WiFi: Не удалось подключиться к точке доступа test, код ошибки -201
+rlog_e("WiFi", "Could not connect to access point %s, error code %d", ap_name, err);
 ```
 
-При этом, если "уровень" функции сообщения (например rlog_v) будет выше заданного в **CONFIG_RLOG_PROJECT_LEVEL**, то предпроцессор просто исключит этот вызов при компиляции, сокращая затраты памяти. 
+the following text will be displayed:
 
-## Настройки
-Настройки модуля осуществляются с помощью определения нескольких макросов:
+```
+12:34:10 [E] WiFi: Could not connect to access point test, error code -201
+```
+
+In this case, if the "level" of the message function (for example, rlog_v) is higher than that specified in **CONFIG_RLOG_PROJECT_LEVEL**, then the preprocessor will simply exclude this call during compilation, reducing memory costs.
+
+## Settings
+Module settings are made by defining several macros:
 
 * **CONFIG_RLOG_PROJECT_LEVEL** RLOG_LEVEL_XXXX
 
-Где **RLOG_LEVEL_XXXX** это одно из следующих значений (см. rLog.h):
+Where **RLOG_LEVEL_XXXX** is one of the following values (см. rLog.h):
 
 ```
-RLOG_LEVEL_NONE       (0)    /* Нет вывода */
-RLOG_LEVEL_ERROR      (1)    /* Критические ошибки, программный модуль не может восстановиться самостоятельно */
-RLOG_LEVEL_WARN       (2)    /* Состояния ошибки, из которых были приняты меры по устранению */
-RLOG_LEVEL_INFO       (3)    /* Информационные сообщения, описывающие нормальный ход событий */
-RLOG_LEVEL_DEBUG      (4)    /* Дополнительная информация, которая не требуется для нормального использования (значения, указатели, размеры и т.д.). */
-RLOG_LEVEL_VERBOSE    (5)    /* Большие фрагменты отладочной информации или частые сообщения, которые потенциально могут переполнить вывод. */
+RLOG_LEVEL_NONE       (0)    /* No output */
+RLOG_LEVEL_ERROR      (1)    /* Critical errors, the program module cannot recover on its own */
+RLOG_LEVEL_WARN       (2)    /* Error conditions from which corrective action was taken */
+RLOG_LEVEL_INFO       (3)    /* Informational messages describing the normal course of events */
+RLOG_LEVEL_DEBUG      (4)    /* Additional information that is not required for normal use (values, pointers, dimensions, etc.). */
+RLOG_LEVEL_VERBOSE    (5)    /* Large chunks of debug information or frequent messages that can potentially flood the output. */
 ```
 
-По умолчанию **RLOG_LEVEL_ERROR**
+Default **RLOG_LEVEL_ERROR**
 
 * **CONFIG_RLOG_PROJECT_COLORS** [0/1]
 
-Установите 1, чтобы в сообщения были добавлены "метки цвета". Это позволит окрасить сообщения разного типа в разные цвета.
+Set to 1 to add "color tags" to messages. This will allow you to color messages of different types in different colors.
 
-По умолчанию **0**
+Default **0**
 
 * **CONFIG_RLOG_SHOW_TIMESTAMP** [0/1]
 
-Установите 1, чтобы в сообщения была автоматически добавлена отметка времени события.
+Set to 1 to automatically add the event time stamp to messages.
 
-По умолчанию **1**
+Default **1**
 
 * **CONFIG_RLOG_SHOW_FILEINFO** [0/1]
 
-Установите 1, чтобы добавить в выводимые сообщения имя файла и номер строки, из которых была вызвана команда.
+Set to 1 to add the filename and line number from which the command was invoked to the output messages.
 
-По умолчанию **1**
+Default **1**
 
-#### Макросы должны быть определены в таком месте, чтобы при сборке _библиотеки_ компилатор смог их найти. 
+#### Macros must be defined in such a place that the compiler can find them when building the _library.
 
-Сделать это можно несколькими способами:
+This can be done in several ways:
 
-* **С помощью файла [platformio.ini](https://docs.platformio.org/page/projectconf.html)**
+* **Using a file [platformio.ini](https://docs.platformio.org/page/projectconf.html)**
 
-Если Вы используте PlatformIO, то вы можете просто добавить определения в [настройки проекта](https://docs.platformio.org/en/latest/projectconf/section_env_build.html#build-flags) (или даже настройки рабочего места):
+If you are using PlatformIO, you can simply add definitions to [project settings](https://docs.platformio.org/en/latest/projectconf/section_env_build.html#build-flags) (or even workplace settings):
 
 ```
 [env]
@@ -105,44 +105,44 @@ build_flags =
   -D CONFIG_RLOG_PROJECT_COLORS=1
 ```
 
-* **С помощью файла sdkconfig.esp32dev**
+* **Using a file sdkconfig.esp32dev**
 
-Если Вы используете фреймворк ESP-IDF, то автоматически Вы получаете файл глобальных настроек проекта **sdkconfig.esp32dev**. Используя специальные методы, можно добавить в него свои параметры. Эти параметры будут доступны из всех файлов и библиотек проекта, что есть удобно.
+If you use the ESP-IDF framework, then automatically you get the global project settings file **sdkconfig.esp32dev**. Using special methods, you can add your own parameters to it. These parameters will be available from all files and libraries of the project, which is convenient.
 
-* **С помощью файла project_config.h**
+* **Using a file project_config.h**
 
-Я использую отдельный файл конфигурации проекта - **project_config.h**, который содержит настройки только моих модулей и библиотек. Это удобно. Проблема только в том, чтобы файл был доступен из библиотек, которые находятся в каталоге, отличном от каталога проекта. В этом случае компилятору необходимо подсказать, где его искать:
+I am using a separate project config file - **project_config.h**, which only contains settings for my modules and libraries. It's comfortable. The only problem is that the file is accessible from libraries that are in a directory other than the project directory. In this case, the compiler needs to be told where to look for it:
 
 ```
 [env]
 build_flags = -Isrc 
 ```	
 
-Этот флаг заставит компилятор при сборке библиотек просматривать подкаталог src из каталога проекта, куда я и поместил свой project_config.h.
+This flag will make the compiler, when building libraries, look at the src subdirectory from the project directory, where I put my project_config.h.
 
-## Примеры использования:
+## Examples of using:
 * arduinoide-arduino
 * platformio-avr-arduino
 * platformio-esp32-arduino
 * platformio-esp32-espidf
 * platformio-esp8266-arduino
 
-## Зависимости
-Библиотека зависит только от "стандартных" библиотек:
+## Dependencies
+The library only depends on the "standard" libraries:
 * stdint.h
 * stdio.h
 * stdarg.h
 * stdlib.h
 * time.h
 
-## Поддерживаниваемые платформы
-Библиотека протестирована на **VSCode + PlatformIO** и **Arduino IDE** для микроконтроллеров AVR, ESP32 и ESP8266. Предполагается, что список микроконтроллеров может больше. Библиотека не зависит от используемого Framework-а: например это может быть Arduino или Espressif32 (ESP-IDF).
+## Supported platforms
+Library tested on **VSCode + PlatformIO** and **Arduino IDE** for AVR, ESP32 and ESP8266 microcontrollers. It is assumed that the list of microcontrollers could be larger. The library does not depend on the Framework used: for example, it can be Arduino or Espressif32 (ESP-IDF).
 
-## Примечание
-Данные замечания относятся к моим библиотекам, размещенным на ресурсе https://github.com/kotyara12?tab=repositories.
+## Note
+These comments refer to my libraries hosted on the resource https://github.com/kotyara12?tab=repositories.
 
-- библиотеки, название которых начинается с префикса **re**, предназначены только для ESP32 и ESP-IDF (FreeRTOS)
-- библиотеки, название которых начинается с префикса **ra**, предназначены только для ARDUINO
-- библиотеки, название которых начинается с префикса **r**, могут быть использованы и для ARDUINO, и для ESP-IDF
+- libraries whose name starts with the **re** prefix are intended only for ESP32 and ESP-IDF (FreeRTOS)
+- libraries whose name begins with the **ra** prefix are intended only for ARDUINO
+- libraries whose name starts with the **r** prefix can be used for both ARDUINO and ESP-IDF
 
-Так как я в настроящее время разрабатываю программы в основном для ESP-IDF, основная часть моих библиотек предназначена только для этого фреймворка. Но Вы можете портировать их для другой системы, взяв за основу.
+Since I am currently developing programs mainly for ESP-IDF, the bulk of my libraries are intended only for this framework. But you can port them to another system using.
