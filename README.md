@@ -1,6 +1,6 @@
 ﻿# rLog: библиотека для вывода отладочных сообщений с возможностью отключения
 
-> If you do not understand this text, please use the English version: <br/>https://github.com/kotyara12/rLog/blob/master/README_EN.md. <br/>Sorry for the machine translation into English.
+> If you do not understand this text, please use the English version: <br/>https://github.com/kotyara12/rLog/blob/master/README_EN.md <br/>Sorry for the machine translation into English.
 
 Данная библиотека представляет собой _набор макросов_ для вывода _форматированных_ отладочных сообщений в COM-порт (с использованием стандартной функции printf), _с возможностью частичного или полного их исключения из кода программы при необходимости_. Создана на основе библиотеки [<esp32-hal-log.h> для Framework Arduino ESP32](https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp32-hal-log.h), с целью обеспечения работоспособности на различных микроконтроллерах и инструментах разработки. Протестировано на AVR, ESP32, ESP8266 для PlatformIO и Arduino IDE. Библиотека _не использует объекты типа String_, вся работа основана на динамическом выделении памяти под строки с помощью стандартных функций, что экономит память.
 
