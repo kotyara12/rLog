@@ -53,7 +53,7 @@ void _rlog_unlock()
 int _rlog_printf(const char *format, ...)
 {
   // Due to the fact that vprintf does not work on some sdk, you have to be perverted
-  static char loc_buf[64];
+  static char loc_buf[256];
   char * temp = loc_buf;
   uint32_t len;
   va_list arg1, arg2;
