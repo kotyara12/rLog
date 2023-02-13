@@ -34,7 +34,7 @@
 #include "freertos/FreeRTOS.h" 
 #include "freertos/semphr.h" 
 
-static xSemaphoreHandle _rlog_mutex;
+static SemaphoreHandle_t _rlog_mutex;
 
 void _rlog_lock()
 {
